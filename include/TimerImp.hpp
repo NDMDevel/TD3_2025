@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Timer/Timer.hpp"
+#include <Arduino.h>
 
 static inline uint32_t millis32()
 {

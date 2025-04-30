@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "TimerImp.hpp"
 
 class MBSlave
 {
@@ -20,13 +21,18 @@ private:
     enum class State
     {
         shutdown,
-        waitIdle
+        resetTimer,
+        waitIdle,
+        ReadMBFrame,
+        waitIdleEnd
     };
 private:
     uint32_t _bauds         = 9600;
     Parity   _parity        = Parity::none;
     StopBit  _stopBits      = StopBit::one;
     State    _st            = State::shutdown;
+    Tim32_us _tim;
+    int _mb_frame_len;
 public:
     void setBaudrate(uint32_t bauds);
     void setParity(Parity parity);
@@ -35,5 +41,6 @@ public:
     void serialInit();
 
     void setID(uint8_t ID);
+    void start();
     void task();
 };

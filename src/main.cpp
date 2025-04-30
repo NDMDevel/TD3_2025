@@ -14,6 +14,8 @@ void setup()
 
   //MB Config
   slave.setID(25);
+
+  slave.start();
 }
 
 void loop()
