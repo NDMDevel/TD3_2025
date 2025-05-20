@@ -1,6 +1,38 @@
 <html>
-    <title>TD3 2025</title>
+    <title>%PAGE_TITLE%</title>
     <body>
         <a>TD3 ESP32 TESTS WEB SERVER</a>
     </body>
+<script>
+
+    function changeText(text)
+    {
+        document.getElementsByTagName("a")[0].text = text;
+    }
+
+
+    const eventSource = new EventSource("/events");
+    var data;
+    eventSource.onmessage = function(event) {
+        console.log("New Data:", event.data);
+    };
+
+    eventSource.onerror = function() {
+        console.log("Connection lost, trying to reconnect...");
+    };
+    function start()
+    {
+        fetch("/start", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "message=data"
+        })
+        .then(response => {
+            console.log(JSON.parse(response));
+        })
+        .catch(error => {
+
+        });
+    }
+</script>
 </html>

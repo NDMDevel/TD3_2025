@@ -1,6 +1,125 @@
-<html>
-    <title>TD3 2025</title>
-    <body>
-        <a>TD3 ESP32 TESTS   asdfasdf WEB SERVER</a>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modbus RTU Configuration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      background-color: #f4f4f4;
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    select, input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 48%;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <h2>Modbus RTU Configuration</h2>
+
+  <label for="mode">Mode:</label>
+  <select id="mode" onchange="toggleFields()">
+    <option value="master">Master</option>
+    <option value="slave">Slave</option>
+  </select>
+
+  <label for="baudrate">Baud Rate:</label>
+  <select id="baudrate">
+    <option>9600</option>
+    <option>19200</option>
+    <option>38400</option>
+    <option>57600</option>
+    <option>115200</option>
+  </select>
+
+  <label for="databits">Data Bits:</label>
+  <select id="databits">
+    <option>7</option>
+    <option selected>8</option>
+  </select>
+
+  <label for="stopbits">Stop Bits:</label>
+  <select id="stopbits">
+    <option>1</option>
+    <option>2</option>
+  </select>
+
+  <label for="parity">Parity:</label>
+  <select id="parity">
+    <option>None</option>
+    <option>Even</option>
+    <option>Odd</option>
+  </select>
+
+  <div id="slave-only">
+    <label for="slave-id">Slave Address:</label>
+    <input type="number" id="slave-id" min="1" max="247" value="1"/>
+  </div>
+
+  <div id="master-only" style="display:none;">
+    <label for="polling-interval">Polling Interval (ms):</label>
+    <input type="number" id="polling-interval" min="100" value="1000"/>
+  </div>
+
+  <div class="button-group">
+    <button onclick="saveConfig()">Save</button>
+    <button onclick="applyConfig()">Apply</button>
+  </div>
+
+  <script>
+    function toggleFields() {
+      const mode = document.getElementById("mode").value;
+      document.getElementById("slave-only").style.display = mode === "slave" ? "block" : "none";
+      document.getElementById("master-only").style.display = mode === "master" ? "block" : "none";
+    }
+
+    function saveConfig() {
+      const config = getConfig();
+      console.log("Saved Config:", config);
+      alert("Configuration saved (see console for values).");
+    }
+
+    function applyConfig() {
+      const config = getConfig();
+      console.log("Applied Config:", config);
+      alert("Configuration applied (see console for values).");
+      // Add AJAX request or WebSocket communication here to send config to backend
+    }
+
+    function getConfig() {
+      return {
+        mode: document.getElementById("mode").value,
+        baudrate: document.getElementById("baudrate").value,
+        databits: document.getElementById("databits").value,
+        stopbits: document.getElementById("stopbits").value,
+        parity: document.getElementById("parity").value,
+        slaveId: document.getElementById("slave-id").value,
+        pollingInterval: document.getElementById("polling-interval").value
+      };
+    }
+
+    window.onload = toggleFields;
+  </script>
+</body>
 </html>
