@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "mb_slave.h"
-
+#include <ArduinoJson.h>
 #include <SPIFFS.h>
 #include "ESPAsyncWebServer.h"
 
@@ -20,30 +20,45 @@ void sendAsyncData()
 {
     events.send("hello");
 }
+
 void home_handler(AsyncWebServerRequest *request)
 {
     request->send(SPIFFS,"/home.html");
 }
 
-String processor(const String& arg)
-{
-  if( arg == "PAGE_TITLE" )
-  {
-    return "MB Master Config";
-  }
-  if( arg == "SERVER_IP" )
-  {
-    return WiFi.localIP().toString();
-  }
-}
-
 void configMB_handler(AsyncWebServerRequest *request)
 {
-    request->send(SPIFFS,"/mb_config.html","",false,processor);
+    request->send(SPIFFS,"/mb_config.html");
 }
+
 void start_handler(AsyncWebServerRequest *request)
 {
-  request->send(200,"application/json","{\"data\":10}\n\n");
+  Serial.printf("params: %d\n",request->params());
+  Serial.printf("args: %d\n",request->args());
+  for( int i=0 ; i<request->args() ; i++ )
+    Serial.println(request->argName(i) + ": " + request->arg(i));
+
+  JsonDocument doc;
+  String jsonBody = request->arg("json");
+  Serial.println("jsonBody: " + jsonBody);
+  deserializeJson(doc, jsonBody);
+  if( doc.containsKey("value") )
+    Serial.println("value: " + doc["value"].as<String>());
+  String response;
+  if (digitalRead(2))
+  {
+      doc["status"] = "Lleno";
+      doc["level"]  = "full";
+      doc["liters"] = 1000;
+  }
+  else
+  {
+      doc["status"] = "Vacio";
+      doc["level"]  = "empty";
+      doc["liters"] = 0;
+  }
+  serializeJson(doc, response);
+  request->send(200, "application/json", response);
 }
 
 
@@ -75,10 +90,8 @@ void setup()
   //web server config
   server.on("/home",home_handler);
   server.on("/configMB",configMB_handler);
-//  server.on("/turn_on_pump2",onPump2_handler);
   server.on("/start",start_handler);
 
-//  server.on("/request", /*HTTP_POST,*/ handle_request);
   server.addHandler(&events);
 
   server.begin();

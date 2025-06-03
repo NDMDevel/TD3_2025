@@ -12,7 +12,7 @@
 
 
     const eventSource = new EventSource("/events");
-    var data;
+    var last_data;
     eventSource.onmessage = function(event) {
         console.log("New Data:", event.data);
     };
@@ -20,15 +20,18 @@
     eventSource.onerror = function() {
         console.log("Connection lost, trying to reconnect...");
     };
-    function start()
+    function start(json_obj)
     {
         fetch("/start", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "message=data"
+            body: "json=" + JSON.stringify(json_obj)
         })
-        .then(response => {
-            console.log(response.json());
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            console.log(JSON.stringify(data));
+            last_data = data;
         })
         .catch(error => {
 
